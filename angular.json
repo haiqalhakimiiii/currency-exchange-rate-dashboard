@@ -18,7 +18,6 @@
         },
         "@schematics/angular:component": {
           "style": "scss",
-          "standalone": false,
           "type": "component",
           "flat": true
         },
