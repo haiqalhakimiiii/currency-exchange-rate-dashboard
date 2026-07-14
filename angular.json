@@ -4,8 +4,8 @@
   "cli": {
     "packageManager": "npm",
     "schematicCollections": [
-      "@cypress/schematic",
-      "@schematics/angular"
+      "@schematics/angular",
+      "@cypress/schematic"
     ]
   },
   "newProjectRoot": "projects",
@@ -16,7 +16,8 @@
         "@schematics/angular:component": {
           "style": "scss",
           "standalone": false,
-          "type": "component"
+          "type": "component",
+          "flat": true
         },
         "@schematics/angular:service": {
           "type": "service"
