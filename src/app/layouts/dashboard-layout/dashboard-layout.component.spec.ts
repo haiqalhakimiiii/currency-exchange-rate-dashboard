@@ -8,7 +8,7 @@ describe('DashboardLayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DashboardLayoutComponent],
+      imports: [DashboardLayoutComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardLayoutComponent);
