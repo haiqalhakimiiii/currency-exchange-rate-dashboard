@@ -13,6 +13,9 @@
     "currency-exchange-rate-dashboard": {
       "projectType": "application",
       "schematics": {
+        "@schematics/angular:module": {
+          "typeSeparator": "."
+        },
         "@schematics/angular:component": {
           "style": "scss",
           "standalone": false,
