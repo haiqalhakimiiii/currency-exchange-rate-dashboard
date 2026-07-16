@@ -190,7 +190,7 @@ export class DashboardService {
       },
     };
 
-    // return this.http.get<LatestExchangeRates>(`${this.apiUrl}/latest/${baseCode ?? "MYR"}}`);
+    // return this.http.get<ExchangeRatesResponse>(`${this.apiUrl}/latest/${baseCode ?? "MYR"}`);
     return of(mockResponse).pipe(delay(2000));
   }
 }

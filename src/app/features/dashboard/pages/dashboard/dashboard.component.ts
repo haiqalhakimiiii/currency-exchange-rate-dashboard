@@ -40,11 +40,18 @@ export class DashboardComponent implements OnInit {
         this.dataSource.sort = sort;
       }
     });
+
+    // Reactively load exchange rates when selected currency changes
+    effect(() => {
+      const selected = this.selectedExchangeRatesTableDropdown();
+      if (selected?.value) {
+        this.getExchangeRatesData();
+      }
+    });
   }
 
   ngOnInit(): void {
     this.getDropdownOptions();
-    this.getExchangeRatesData();
   }
 
   getDropdownOptions(): void {
