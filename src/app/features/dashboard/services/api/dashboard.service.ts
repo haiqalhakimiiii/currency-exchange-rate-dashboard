@@ -10,7 +10,7 @@ export class DashboardService {
 
   private http = inject(HttpClient);
 
-  getLatestExchangeRates(): Observable<ExchangeRatesResponse> {
+  getLatestExchangeRates(baseCode?: string | number): Observable<ExchangeRatesResponse> {
     const mockResponse: ExchangeRatesResponse = {
       result: 'success',
       documentation: 'https://www.exchangerate-api.com/docs',
@@ -190,7 +190,7 @@ export class DashboardService {
       },
     };
 
-    // return this.http.get<LatestExchangeRates>(`${this.apiUrl}/latest/MYR`);
+    // return this.http.get<LatestExchangeRates>(`${this.apiUrl}/latest/${baseCode ?? "MYR"}}`);
     return of(mockResponse).pipe(delay(2000));
   }
 }

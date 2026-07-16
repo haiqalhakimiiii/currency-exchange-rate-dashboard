@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, effect, inject, model, OnInit, signal, viewChild } from '@angular/core';
 import { ConversionRate, ExchangeRatesResponse } from '../../models/dashboard.model';
 import { DashboardService } from '../../services/api/dashboard.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -6,22 +6,29 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatePipe } from '@angular/common';
 import { finalize } from 'rxjs';
+import { SingleSelectDropdownComponent } from '../../../../core/components/single-select-dropdown/single-select-dropdown.component';
+import { DropdownOptionModel } from '../../../../core/models/dropdown.model';
+import { ExchangeRateService } from '../../../../core/services/api/exchange-rate.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatTableModule, MatSortModule, MatProgressBarModule, DatePipe],
+  imports: [MatTableModule, MatSortModule, MatProgressBarModule, DatePipe, SingleSelectDropdownComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent implements OnInit {
-  private apiService = inject(DashboardService);
+  private dashboardService = inject(DashboardService);
+  private exchangeRateService = inject(ExchangeRateService);
+
   sort = viewChild(MatSort);
 
   conversionRatesData = signal<ConversionRate[]>([]);
-  isLoading = signal(true);
+  exchangeRatesTableDropdownOptions = signal<DropdownOptionModel[]>([]);
   error = signal<string | null>(null);
+  isLoading = signal(true);
   latestExchangeRatesData = signal<ExchangeRatesResponse | null>(null);
+  selectedExchangeRatesTableDropdown = model<DropdownOptionModel | null>(null);
 
   dataSource = new MatTableDataSource<ConversionRate>();
   displayedColumns: string[] = ['currency', 'rate', 'base'];
@@ -36,11 +43,27 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getDropdownOptions();
     this.getExchangeRatesData();
   }
 
+  getDropdownOptions(): void {
+    this.exchangeRateService.getSupportedCodes().subscribe((response) => {
+      const options = response.supported_codes.map(([code, description]) => ({
+        label: `${code} - ${description}`,
+        value: code,
+      }));
+      this.exchangeRatesTableDropdownOptions.set(options);
+
+      const myrOption = options.find(option => option.value === 'MYR');
+      if (myrOption) {
+        this.selectedExchangeRatesTableDropdown.set(myrOption);
+      }
+    });
+  }
+
   getExchangeRatesData(): void {
-    this.apiService.getLatestExchangeRates().pipe(
+    this.dashboardService.getLatestExchangeRates(this.selectedExchangeRatesTableDropdown()?.value).pipe(
       finalize(() => {
         this.isLoading.set(false);
       })

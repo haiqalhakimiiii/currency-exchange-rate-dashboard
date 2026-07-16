@@ -1,5 +1,10 @@
 <div class="space-y-2">
-  <div class="text-lg font-bold">Exchange Rates</div>
+  <div class="d-flex items-center justify-between">
+    <div class="text-lg font-bold">Exchange Rates</div>
+    <app-single-select-dropdown labelText="Select Currency Code"
+                                [options]="exchangeRatesTableDropdownOptions()"
+                                [(value)]="selectedExchangeRatesTableDropdown" />
+  </div>
 
   <div class="drop-shadow-lg max-h-100 overflow-hidden overflow-y-auto relative">
     <table mat-table [dataSource]="dataSource" matSort>
