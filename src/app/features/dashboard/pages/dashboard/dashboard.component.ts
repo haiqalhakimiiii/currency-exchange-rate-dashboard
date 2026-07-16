@@ -1,5 +1,5 @@
 import { Component, effect, inject, OnInit, signal, viewChild } from '@angular/core';
-import { ConversionRate, LatestExchangeRates } from '../../models/dashboard.model';
+import { ConversionRate, ExchangeRatesResponse } from '../../models/dashboard.model';
 import { DashboardService } from '../../services/api/dashboard.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
   conversionRatesData = signal<ConversionRate[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
-  latestExchangeRatesData = signal<LatestExchangeRates | null>(null);
+  latestExchangeRatesData = signal<ExchangeRatesResponse | null>(null);
 
   dataSource = new MatTableDataSource<ConversionRate>();
   displayedColumns: string[] = ['currency', 'rate', 'base'];

@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 import { delay, Observable, of, timeout } from 'rxjs';
-import { LatestExchangeRates } from '../../models/dashboard.model';
+import { ExchangeRatesResponse } from '../../models/dashboard.model';
 import { HttpClient } from '@angular/common/http';
 
 @Service()
@@ -10,8 +10,8 @@ export class DashboardService {
 
   private http = inject(HttpClient);
 
-  getLatestExchangeRates(): Observable<LatestExchangeRates> {
-    const mockResponse: LatestExchangeRates = {
+  getLatestExchangeRates(): Observable<ExchangeRatesResponse> {
+    const mockResponse: ExchangeRatesResponse = {
       result: 'success',
       documentation: 'https://www.exchangerate-api.com/docs',
       terms_of_use: 'https://www.exchangerate-api.com/terms',
