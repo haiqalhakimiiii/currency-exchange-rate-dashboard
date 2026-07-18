@@ -1,0 +1,64 @@
+<div class="space-y-4">
+  <div class="drop-shadow-lg max-h-100 overflow-hidden overflow-y-auto relative">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Currency Column -->
+      <ng-container matColumnDef="currency">
+        <th class="bg-gray-200!" mat-header-cell *matHeaderCellDef mat-sort-header
+          sortActionDescription="Sort by currency">
+          Currency Code
+        </th>
+        <td mat-cell *matCellDef="let element"> {{ element.currency }}</td>
+      </ng-container>
+
+      <!-- Rate Column -->
+      <ng-container matColumnDef="rate">
+        <th class="bg-gray-200!" mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by rate">
+          Rate
+        </th>
+        <td mat-cell *matCellDef="let element"> {{ element.rate }}</td>
+      </ng-container>
+
+      <!-- Base Column -->
+      <ng-container matColumnDef="base">
+        <th class="bg-gray-200!" mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by base">
+          Base
+        </th>
+        <td mat-cell *matCellDef="let element"> {{ element.base }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="loading">
+        <td *matFooterCellDef mat-footer-cell [attr.colspan]="displayedColumns.length">
+          <mat-progress-bar mode="query"></mat-progress-bar>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="noData">
+        <td *matFooterCellDef mat-footer-cell class="text-center!" [attr.colspan]="displayedColumns.length">
+          No Records
+        </td>
+      </ng-container>
+
+      <tr *matFooterRowDef="['noData']" mat-footer-row [class.hidden]="isLoading() || conversionRatesData().length !== 0">
+      </tr>
+
+      <tr *matFooterRowDef="['loading']" mat-footer-row [class.hidden]="!isLoading()"></tr>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  @if (error()) {
+    <p class="text-red-600 text-sm text-right">{{ error() }}</p>
+  }
+
+  @if (latestExchangeRatesData() !== null) {
+    <div class="flex gap-2 items-center justify-end">
+      <p>Last Updated : {{ latestExchangeRatesData()!.time_last_update_utc | date:'EEEE, dd MMMM yyyy hh.mma':'Asia/Kuala_Lumpur' }}</p>
+      <button class="drop-shadow-sm border p-1 rounded-sm" (click)="refreshData()">
+        Refresh
+      </button>
+    </div>
+  }
+</div>
+

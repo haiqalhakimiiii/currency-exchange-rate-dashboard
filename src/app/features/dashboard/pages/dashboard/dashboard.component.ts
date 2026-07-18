@@ -1,19 +1,15 @@
-import { Component, effect, inject, model, OnInit, signal, viewChild } from '@angular/core';
-import { ConversionRate, ExchangeRatesResponse } from '../../models/dashboard.model';
+import { Component, effect, inject, model, OnInit, signal } from '@angular/core';
 import { DashboardService } from '../../services/api/dashboard.service';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { DatePipe } from '@angular/common';
-import { finalize, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { SingleSelectDropdownComponent } from '../../../../core/components/single-select-dropdown/single-select-dropdown.component';
 import { DropdownOptionModel } from '../../../../core/models/dropdown.model';
 import { ExchangeRateService } from '../../../../core/services/api/exchange-rate.service';
+import { ExchangeRatesTableComponent } from "./components/exchange-rates-table/exchange-rates-table.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatTableModule, MatSortModule, MatProgressBarModule, DatePipe, SingleSelectDropdownComponent],
+  imports: [SingleSelectDropdownComponent, ExchangeRatesTableComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -21,31 +17,15 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private exchangeRateService = inject(ExchangeRateService);
 
-  sort = viewChild(MatSort);
-
-  conversionRatesData = signal<ConversionRate[]>([]);
   exchangeRatesTableDropdownOptions = signal<DropdownOptionModel[]>([]);
-  error = signal<string | null>(null);
-  isLoading = signal(true);
-  latestExchangeRatesData = signal<ExchangeRatesResponse | null>(null);
   selectedBaseCode = model<DropdownOptionModel | null>(null);
 
-  dataSource = new MatTableDataSource<ConversionRate>();
-  displayedColumns: string[] = ['currency', 'rate', 'base'];
 
   constructor() {
-    effect(() => {
-      const sort = this.sort();
-      if (sort) {
-        this.dataSource.sort = sort;
-      }
-    });
-
     // Reactively load exchange rates when selected currency changes
     effect(() => {
       const selected = this.selectedBaseCode();
       if (selected?.value) {
-        this.getExchangeRatesData();
         this.getHistoricalData();
       }
     });
@@ -67,30 +47,6 @@ export class DashboardComponent implements OnInit {
       if (myrOption) {
         this.selectedBaseCode.set(myrOption);
       }
-    });
-  }
-
-  refreshData(): void {
-    this.isLoading.set(true);
-    this.error.set(null);
-    this.conversionRatesData.set([]);
-    this.dataSource.data = [];
-    this.getExchangeRatesData();
-  }
-
-  private getExchangeRatesData(): void {
-    this.dashboardService.getLatestExchangeRates(this.selectedBaseCode()?.value).pipe(
-      finalize(() => {
-        this.isLoading.set(false);
-      })
-    ).subscribe({
-      next: (result) => {
-        this.latestExchangeRatesData.set(result);
-        this.mapData(result.conversion_rates, result.base_code);
-      },
-      error: () => {
-        this.error.set('Failed to load exchange rates. Please try again.');
-      },
     });
   }
 
@@ -124,16 +80,5 @@ export class DashboardComponent implements OnInit {
     }
 
     return dates;
-  }
-
-  private mapData(conversionRates: Record<string, number>, baseCode: string): void {
-    const mappedRates = Object.entries(conversionRates).map(([currency, rate]) => ({
-      base: baseCode,
-      currency,
-      rate,
-    }));
-
-    this.conversionRatesData.set(mappedRates);
-    this.dataSource.data = mappedRates;
   }
 }
