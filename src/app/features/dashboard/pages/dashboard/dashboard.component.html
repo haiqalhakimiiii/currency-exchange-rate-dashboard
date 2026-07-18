@@ -3,7 +3,7 @@
     <div class="text-lg font-bold">Exchange Rates</div>
     <app-single-select-dropdown labelText="Select Currency Code"
                                 [options]="exchangeRatesTableDropdownOptions()"
-                                [(value)]="selectedExchangeRatesTableDropdown" />
+                                [(value)]="selectedBaseCode" />
   </div>
 
   <div class="drop-shadow-lg max-h-100 overflow-hidden overflow-y-auto relative">

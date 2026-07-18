@@ -28,7 +28,7 @@ export class DashboardComponent implements OnInit {
   error = signal<string | null>(null);
   isLoading = signal(true);
   latestExchangeRatesData = signal<ExchangeRatesResponse | null>(null);
-  selectedExchangeRatesTableDropdown = model<DropdownOptionModel | null>(null);
+  selectedBaseCode = model<DropdownOptionModel | null>(null);
 
   dataSource = new MatTableDataSource<ConversionRate>();
   displayedColumns: string[] = ['currency', 'rate', 'base'];
@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
 
     // Reactively load exchange rates when selected currency changes
     effect(() => {
-      const selected = this.selectedExchangeRatesTableDropdown();
+      const selected = this.selectedBaseCode();
       if (selected?.value) {
         this.getExchangeRatesData();
         this.getHistoricalData();
@@ -65,7 +65,7 @@ export class DashboardComponent implements OnInit {
 
       const myrOption = options.find(option => option.value === 'MYR');
       if (myrOption) {
-        this.selectedExchangeRatesTableDropdown.set(myrOption);
+        this.selectedBaseCode.set(myrOption);
       }
     });
   }
@@ -79,7 +79,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private getExchangeRatesData(): void {
-    this.dashboardService.getLatestExchangeRates(this.selectedExchangeRatesTableDropdown()?.value).pipe(
+    this.dashboardService.getLatestExchangeRates(this.selectedBaseCode()?.value).pipe(
       finalize(() => {
         this.isLoading.set(false);
       })
@@ -96,7 +96,7 @@ export class DashboardComponent implements OnInit {
 
   private getHistoricalData(): void {
     const requests = this.getPastMonthDates().map(date => {
-      return this.dashboardService.getHistoricalExchangeRates(date, this.selectedExchangeRatesTableDropdown()?.value);
+      return this.dashboardService.getHistoricalExchangeRates(date, this.selectedBaseCode()?.value);
     });
 
     forkJoin(requests).subscribe(results => {
