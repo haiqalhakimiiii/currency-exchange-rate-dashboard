@@ -1,5 +1,25 @@
-<div class="space-y-6">
-  <div class="text-[1rem] font-semibold">Historical Trends Analysis</div>
+<div class="space-y-4 mt-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="text-[1rem] font-semibold">Historical Trends Analysis</div>
+
+    <div class="inline-flex rounded-md border border-gray-300 p-1">
+      <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
+        [class.bg-blue-600]="aggregationMode() === 'daily'" [class.text-white]="aggregationMode() === 'daily'"
+        [class.text-gray-700]="aggregationMode() !== 'daily'" (click)="setAggregationMode('daily')">
+        Daily
+      </button>
+      <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
+        [class.bg-blue-600]="aggregationMode() === 'weekly'" [class.text-white]="aggregationMode() === 'weekly'"
+        [class.text-gray-700]="aggregationMode() !== 'weekly'" (click)="setAggregationMode('weekly')">
+        Weekly
+      </button>
+      <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
+        [class.bg-blue-600]="aggregationMode() === 'monthly'" [class.text-white]="aggregationMode() === 'monthly'"
+        [class.text-gray-700]="aggregationMode() !== 'monthly'" (click)="setAggregationMode('monthly')">
+        Monthly
+      </button>
+    </div>
+  </div>
 
   <div class="flex gap-4">
     <app-single-select-dropdown labelText="Compare Currency 1" [options]="exchangeRatesTableDropdownOptions()"

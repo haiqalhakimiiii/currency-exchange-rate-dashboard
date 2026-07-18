@@ -9,6 +9,8 @@ import { SingleSelectDropdownComponent } from '../../../../../../core/components
 
 Chart.register(...registerables);
 
+type AggregationMode = 'daily' | 'weekly' | 'monthly';
+
 @Component({
   selector: 'app-historical-trends-analysis',
   imports: [SingleSelectDropdownComponent, CommonModule],
@@ -27,6 +29,7 @@ export class HistoricalTrendsAnalysisComponent implements AfterViewInit, OnDestr
 
   exchangeRatesTableDropdownOptions = input<DropdownOptionModel[]>([]);
   selectedBaseCode = input<DropdownOptionModel | null>(null);
+  aggregationMode = signal<AggregationMode>('daily');
 
   firstSelectedCurrencyToCompare = model<DropdownOptionModel | null>(null);
   secondSelectedCurrencyToCompare = model<DropdownOptionModel | null>(null);
@@ -58,8 +61,13 @@ export class HistoricalTrendsAnalysisComponent implements AfterViewInit, OnDestr
       this.firstSelectedCurrencyToCompare();
       this.secondSelectedCurrencyToCompare();
       this.thirdSelectedCurrencyToCompare();
+      this.aggregationMode();
       this.updateChart();
     });
+  }
+
+  setAggregationMode(mode: AggregationMode): void {
+    this.aggregationMode.set(mode);
   }
 
   ngAfterViewInit(): void {
@@ -183,9 +191,12 @@ export class HistoricalTrendsAnalysisComponent implements AfterViewInit, OnDestr
       return;
     }
 
+    const aggregationBuckets = this.getAggregationBuckets(this.dates(), this.aggregationMode());
+    const labels = aggregationBuckets.map(bucket => bucket.label);
+
     const colors = ['#FF6384', '#36A2EB', '#FFCE56'];
     const datasets: ChartDataset<'line', (number | null)[]>[] = currencies.map((currency, index) => {
-      const rates = historicalData.map(data => data.conversion_rates[currency] ?? null);
+      const rates = aggregationBuckets.map(bucket => this.getAggregatedCurrencyRate(historicalData, currency, bucket.indexes));
       return {
         label: currency,
         data: rates,
@@ -202,9 +213,83 @@ export class HistoricalTrendsAnalysisComponent implements AfterViewInit, OnDestr
       };
     });
 
-    this.chart.data.labels = this.dates();
+    this.chart.data.labels = labels;
     this.chart.data.datasets = datasets;
     this.chart.update();
+  }
+
+  private getAggregationBuckets(dates: string[], mode: AggregationMode): Array<{ label: string; indexes: number[] }> {
+    if (mode === 'daily') {
+      return dates.map((date, index) => ({
+        label: this.formatShortDate(date),
+        indexes: [index]
+      }));
+    }
+
+    if (mode === 'weekly') {
+      const buckets: Array<{ label: string; indexes: number[] }> = [];
+
+      for (let i = 0; i < dates.length; i += 7) {
+        const indexes = Array.from({ length: Math.min(7, dates.length - i) }, (_, offset) => i + offset);
+        const startDate = dates[indexes[0]];
+        const endDate = dates[indexes[indexes.length - 1]];
+
+        buckets.push({
+          label: `${this.formatShortDate(startDate)} - ${this.formatShortDate(endDate)}`,
+          indexes,
+        });
+      }
+
+      return buckets;
+    }
+
+    const monthlyGroups = new Map<string, number[]>();
+
+    dates.forEach((date, index) => {
+      const monthKey = date.slice(0, 7);
+      const group = monthlyGroups.get(monthKey) ?? [];
+      group.push(index);
+      monthlyGroups.set(monthKey, group);
+    });
+
+    return Array.from(monthlyGroups.entries()).map(([monthKey, indexes]) => ({
+      label: this.formatMonthLabel(monthKey),
+      indexes,
+    }));
+  }
+
+  private getAggregatedCurrencyRate(
+    historicalData: HistoryConversionRatesResponse[],
+    currency: string,
+    indexes: number[]
+  ): number | null {
+    const rates = indexes
+      .map(index => historicalData[index]?.conversion_rates[currency])
+      .filter((rate): rate is number => typeof rate === 'number');
+
+    if (rates.length === 0) {
+      return null;
+    }
+
+    const total = rates.reduce((sum, rate) => sum + rate, 0);
+    return Number((total / rates.length).toFixed(6));
+  }
+
+  private formatShortDate(dateString: string): string {
+    const date = new Date(`${dateString}T00:00:00`);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
+  }
+
+  private formatMonthLabel(monthKey: string): string {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(Number(year), Number(month) - 1, 1);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      year: 'numeric'
+    }).format(date);
   }
 
   private getPastMonthDates(): string[] {
