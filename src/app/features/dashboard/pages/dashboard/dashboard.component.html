@@ -1,12 +1,14 @@
 <div class="space-y-4">
-  <div class="flex items-center justify-between">
-    <div class="text-lg font-bold">Exchange Rates</div>
+  <section
+    class="flex items-center justify-between my-6 rounded-3xl border border-black bg-white p-5 shadow-none sm:p-6">
+    <h1 class="m-0 text-[1.5rem] font-bold text-black">Currency Exchange Rate Dashboard</h1>
+
     <div class="w-72">
       <app-single-select-dropdown class="ml-auto" labelText="Select Base Currency Code"
         [options]="exchangeRatesTableDropdownOptions()" [(value)]="selectedBaseCode" />
     </div>
 
-  </div>
+  </section>
 
   <app-exchange-rates-table [selectedBaseCode]="selectedBaseCode()" />
 

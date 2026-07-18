@@ -1,20 +1,20 @@
-<div class="space-y-4 mt-4">
+<section class="space-y-4 mt-4 my-6 rounded-3xl border border-black bg-white p-5 shadow-none sm:p-6">
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <div class="text-[1rem] font-semibold">Historical Trends Analysis</div>
+    <div class="m-0 text-[1.35rem] font-bold text-black">Historical Trends Analysis</div>
 
     <div class="inline-flex rounded-md border border-gray-300 p-1">
       <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
-        [class.bg-blue-600]="aggregationMode() === 'daily'" [class.text-white]="aggregationMode() === 'daily'"
+        [class.bg-gray-600]="aggregationMode() === 'daily'" [class.text-white]="aggregationMode() === 'daily'"
         [class.text-gray-700]="aggregationMode() !== 'daily'" (click)="setAggregationMode('daily')">
         Daily
       </button>
       <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
-        [class.bg-blue-600]="aggregationMode() === 'weekly'" [class.text-white]="aggregationMode() === 'weekly'"
+        [class.bg-gray-600]="aggregationMode() === 'weekly'" [class.text-white]="aggregationMode() === 'weekly'"
         [class.text-gray-700]="aggregationMode() !== 'weekly'" (click)="setAggregationMode('weekly')">
         Weekly
       </button>
       <button type="button" class="rounded px-3 py-1 text-sm font-medium transition-colors"
-        [class.bg-blue-600]="aggregationMode() === 'monthly'" [class.text-white]="aggregationMode() === 'monthly'"
+        [class.bg-gray-600]="aggregationMode() === 'monthly'" [class.text-white]="aggregationMode() === 'monthly'"
         [class.text-gray-700]="aggregationMode() !== 'monthly'" (click)="setAggregationMode('monthly')">
         Monthly
       </button>
@@ -41,4 +41,4 @@
       <p>Select at least one currency to view the chart</p>
     </div>
   }
-</div>
+</section>
