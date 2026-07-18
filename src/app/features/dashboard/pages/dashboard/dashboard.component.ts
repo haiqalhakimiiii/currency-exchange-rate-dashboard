@@ -5,7 +5,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatePipe } from '@angular/common';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { SingleSelectDropdownComponent } from '../../../../core/components/single-select-dropdown/single-select-dropdown.component';
 import { DropdownOptionModel } from '../../../../core/models/dropdown.model';
 import { ExchangeRateService } from '../../../../core/services/api/exchange-rate.service';
@@ -46,6 +46,7 @@ export class DashboardComponent implements OnInit {
       const selected = this.selectedExchangeRatesTableDropdown();
       if (selected?.value) {
         this.getExchangeRatesData();
+        this.getHistoricalData();
       }
     });
   }
@@ -69,7 +70,15 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  getExchangeRatesData(): void {
+  refreshData(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+    this.conversionRatesData.set([]);
+    this.dataSource.data = [];
+    this.getExchangeRatesData();
+  }
+
+  private getExchangeRatesData(): void {
     this.dashboardService.getLatestExchangeRates(this.selectedExchangeRatesTableDropdown()?.value).pipe(
       finalize(() => {
         this.isLoading.set(false);
@@ -85,12 +94,36 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  refreshData(): void {
-    this.isLoading.set(true);
-    this.error.set(null);
-    this.conversionRatesData.set([]);
-    this.dataSource.data = [];
-    this.getExchangeRatesData();
+  private getHistoricalData(): void {
+    const requests = this.getPastMonthDates().map(date => {
+      return this.dashboardService.getHistoricalExchangeRates(date, this.selectedExchangeRatesTableDropdown()?.value);
+    });
+
+    forkJoin(requests).subscribe(results => {
+      // TODO: generate a 3 distinct data to be used in multi line chart to compare based on 3 selected currencies
+      console.log(results);
+    });
+  }
+
+  private getPastMonthDates(): string[] {
+    const dates: string[] = [];
+
+    const today = new Date();
+
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      const formattedDate = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+      ].join('-');
+
+      dates.push(formattedDate);
+    }
+
+    return dates;
   }
 
   private mapData(conversionRates: Record<string, number>, baseCode: string): void {
