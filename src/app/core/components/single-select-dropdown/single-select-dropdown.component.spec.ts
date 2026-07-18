@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SingleSelectDropdownComponent } from './single-select-dropdown.component';
 import { DropdownOptionModel } from '../../models/dropdown.model';
-import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 describe('SingleSelectDropdownComponent', () => {
   let component: SingleSelectDropdownComponent;
@@ -16,7 +17,7 @@ describe('SingleSelectDropdownComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SingleSelectDropdownComponent, MatSelectModule, MatFormFieldModule],
+      imports: [SingleSelectDropdownComponent, MatAutocompleteModule, MatFormFieldModule, MatInputModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SingleSelectDropdownComponent);
@@ -44,19 +45,20 @@ describe('SingleSelectDropdownComponent', () => {
     expect(formField.classList.contains('dropdown-field')).toBe(true);
   });
 
-  it('should have mat-select element', () => {
-    const select = fixture.nativeElement.querySelector('mat-select');
-    expect(select).toBeTruthy();
+  it('should have input element for autocomplete', () => {
+    const input = fixture.nativeElement.querySelector('input');
+    expect(input).toBeTruthy();
   });
 
-  it('should update value when option is selected', () => {
+  it('should update value and search text when option is selected', () => {
     TestBed.runInInjectionContext(() => {
       fixture.componentRef.setInput('options', mockOptions);
     });
     fixture.detectChanges();
 
-    component.value.set(mockOptions[0]);
+    component.selectOption(mockOptions[0]);
     expect(component.value()).toEqual(mockOptions[0]);
+    expect(component.searchText()).toBe(mockOptions[0].label);
   });
 
   it('should respect disabled state', () => {
@@ -65,8 +67,8 @@ describe('SingleSelectDropdownComponent', () => {
     });
     fixture.detectChanges();
 
-    const select = fixture.nativeElement.querySelector('mat-select');
-    expect(select.getAttribute('aria-disabled')).toBe('true');
+    const input = fixture.nativeElement.querySelector('input');
+    expect(input.disabled).toBe(true);
   });
 
   it('should use compareOptions for value comparison', () => {
@@ -96,8 +98,8 @@ describe('SingleSelectDropdownComponent', () => {
     });
     fixture.detectChanges();
 
-    const select = fixture.nativeElement.querySelector('mat-select');
-    expect(select.getAttribute('aria-label')).toBe('Currency Selection');
+    const input = fixture.nativeElement.querySelector('input');
+    expect(input.getAttribute('aria-label')).toBe('Currency Selection');
   });
 
   it('should fallback to labelText for aria-label when ariaLabel is not provided', () => {
@@ -106,8 +108,8 @@ describe('SingleSelectDropdownComponent', () => {
     });
     fixture.detectChanges();
 
-    const select = fixture.nativeElement.querySelector('mat-select');
-    expect(select.getAttribute('aria-label')).toBe('Select Currency');
+    const input = fixture.nativeElement.querySelector('input');
+    expect(input.getAttribute('aria-label')).toBe('Select Currency');
   });
 
   it('should initialize with null value', () => {
@@ -116,5 +118,16 @@ describe('SingleSelectDropdownComponent', () => {
 
   it('should not be disabled by default', () => {
     expect(component.disabled()).toBe(false);
+  });
+
+  it('should filter options from search text', () => {
+    TestBed.runInInjectionContext(() => {
+      fixture.componentRef.setInput('options', mockOptions);
+    });
+    fixture.detectChanges();
+
+    component.onSearchTextChange('2');
+
+    expect(component.filteredOptions()).toEqual([mockOptions[1]]);
   });
 });
