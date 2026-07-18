@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 import { delay, Observable, of } from 'rxjs';
-import { ExchangeRatesResponse, HistoryConversionRatesResponse } from '../../models/dashboard.model';
+import { CurrencyConversionResponse, ExchangeRatesResponse, HistoryConversionRatesResponse } from '../../models/dashboard.model';
 import { HttpClient } from '@angular/common/http';
 
 @Service()
@@ -370,5 +370,15 @@ export class DashboardService {
     return of(mockResponse).pipe(delay(2000));
 
     // return this.http.get<HistoryConversionRatesResponse>(`${this.apiUrl}/history/${baseCode ?? "MYR"}/${year}/${month}/${day}`);
+  }
+
+  convertCurrency(from: string | number, to: string | number, amount: number): Observable<CurrencyConversionResponse> {
+    const mockResponse: CurrencyConversionResponse = {
+      conversion_rate: 0.24500457,
+      conversion_result: 24.500457
+    }
+
+    return of(mockResponse).pipe(delay(2000));
+    return this.http.get<CurrencyConversionResponse>(`${this.apiUrl}/pair/${from}/${to}/${amount}`);
   }
 }

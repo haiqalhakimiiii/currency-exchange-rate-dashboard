@@ -4,11 +4,12 @@ import { DropdownOptionModel } from '../../../../core/models/dropdown.model';
 import { ExchangeRateService } from '../../../../core/services/api/exchange-rate.service';
 import { ExchangeRatesTableComponent } from "./components/exchange-rates-table/exchange-rates-table.component";
 import { HistoricalTrendsAnalysisComponent } from "./components/historical-trends-analysis/historical-trends-analysis.component";
+import { CurrencyConversionCalculatorComponent } from "./components/currency-conversion-calculator/currency-conversion-calculator.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [SingleSelectDropdownComponent, ExchangeRatesTableComponent, HistoricalTrendsAnalysisComponent],
+  imports: [SingleSelectDropdownComponent, ExchangeRatesTableComponent, HistoricalTrendsAnalysisComponent, CurrencyConversionCalculatorComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })

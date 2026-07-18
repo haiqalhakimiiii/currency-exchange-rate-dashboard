@@ -18,3 +18,8 @@ export interface HistoryConversionRatesResponse {
   day: number;
   conversion_rates: Record<string, number>;
 }
+
+export interface CurrencyConversionResponse {
+  conversion_rate: number;
+  conversion_result: number;
+}

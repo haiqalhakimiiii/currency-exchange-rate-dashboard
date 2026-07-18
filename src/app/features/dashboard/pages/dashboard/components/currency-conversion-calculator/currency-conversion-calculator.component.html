@@ -1,0 +1,74 @@
+<section class="my-6 rounded-3xl border border-black bg-white p-5 shadow-none sm:p-6">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 class="m-0 text-[1.35rem] font-bold text-black">Currency Conversion Calculator</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-black">
+        Compare two currencies and convert any amount with the current rate.
+      </p>
+    </div>
+  </div>
+
+  <form class="mt-6" (submit)="onSubmit($event)">
+    <div class="flex items-center justify-around">
+      <app-single-select-dropdown labelText="From" [(value)]="fromCurrency" [disabled]="isLoading()"
+        [options]="exchangeRatesTableDropdownOptions()" />
+
+      <button
+        class="h-12 rounded-2xl border border-black bg-white px-4 text-sm font-bold text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+        type="button" [disabled]="isLoading() || !isValid()" (click)="swapCurrencies()" aria-label="Swap selected currencies">
+        Swap
+      </button>
+
+      <app-single-select-dropdown labelText="To" [(value)]="toCurrency" [disabled]="isLoading()"
+        [options]="exchangeRatesTableDropdownOptions()" />
+    </div>
+
+    <div class="mt-4 grid grid-cols-1 items-end gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+      <label class="flex flex-col gap-2 font-semibold text-black" [class.opacity-60]="isLoading()">
+        <span>Amount</span>
+        <input
+          class="h-12 rounded-2xl border border-black bg-white px-4 text-black outline-none transition-opacity placeholder:text-black/50 focus:ring-0"
+          type="number" step="0.01" placeholder="Enter amount" [formField]="currencyConversionForm.amount" />
+      </label>
+
+      <button
+        class="h-12 min-w-40 rounded-2xl border border-black bg-black px-5 font-bold text-white transition-opacity disabled:cursor-not-allowed disabled:bg-white disabled:text-black disabled:opacity-60 max-md:w-full"
+        type="submit" [disabled]="!isValid()">
+        {{ isLoading() ? 'Converting...' : 'Convert now' }}
+      </button>
+    </div>
+
+    @if (amountErrorMessage()) {
+      <p class="mt-3 text-sm text-black">{{ amountErrorMessage() }}</p>
+    }
+
+    @if (errorMessage()) {
+      <p class="mt-3 text-sm text-black">{{ errorMessage() }}</p>
+    }
+  </form>
+
+  @if (isLoading()) {
+    <div class="mt-5 inline-flex items-center gap-3 rounded-2xl border border-black bg-white px-4 py-3 text-black">
+      <mat-spinner diameter="26"></mat-spinner>
+      <p class="m-0 text-sm font-medium">Fetching the latest conversion rate...</p>
+    </div>
+  }
+
+  @if (currencyConversionResult() !== null) {
+    <div class="mt-5 rounded-2xl border border-black bg-white p-4">
+      <p class="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-black">Converted amount</p>
+      <div class="flex flex-wrap items-baseline gap-1 text-2xl font-extrabold text-black">
+        <span>{{ currencyConversionModel().amount }}</span>
+        <span>{{ fromCurrency()?.value }}</span>
+        <span>=</span>
+        <span>{{ currencyConversionResult()?.conversion_result | number:'1.2-2' }}</span>
+        <span>{{ toCurrency()?.value }}</span>
+      </div>
+
+      <p class="mt-3 text-sm font-semibold text-black">
+        1 {{ fromCurrency()?.value }} = {{ currencyConversionResult()?.conversion_rate | number:'1.4-4' }} {{
+        toCurrency()?.value }}
+      </p>
+    </div>
+  }
+</section>
