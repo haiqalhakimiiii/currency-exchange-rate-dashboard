@@ -9,7 +9,7 @@
   </div>
 
   <form class="mt-6" (submit)="onSubmit($event)">
-    <div class="flex items-center justify-around">
+    <div class="flex max-md:flex-col items-center justify-around gap-4">
       <app-single-select-dropdown labelText="From" [(value)]="fromCurrency" [disabled]="isLoading()"
         [options]="exchangeRatesTableDropdownOptions()" />
 
