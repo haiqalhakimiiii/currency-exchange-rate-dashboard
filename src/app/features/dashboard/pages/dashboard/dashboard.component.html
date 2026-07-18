@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between">
     <div class="text-lg font-bold">Exchange Rates</div>
     <div class="w-72">
-      <app-single-select-dropdown class="ml-auto " labelText="Select Base Currency Code"
+      <app-single-select-dropdown class="ml-auto" labelText="Select Base Currency Code"
         [options]="exchangeRatesTableDropdownOptions()" [(value)]="selectedBaseCode" />
     </div>
 
@@ -10,5 +10,6 @@
 
   <app-exchange-rates-table [selectedBaseCode]="selectedBaseCode()" />
 
-  <app-historical-trends-analysis [selectedBaseCode]="selectedBaseCode()" />
+  <app-historical-trends-analysis [selectedBaseCode]="selectedBaseCode()"
+    [exchangeRatesTableDropdownOptions]="exchangeRatesTableDropdownOptions()" />
 </div>

@@ -1,1 +1,24 @@
-<p>historical-trends-analysis works!</p>
+<div class="space-y-6">
+  <div class="text-[1rem] font-semibold">Historical Trends Analysis</div>
+
+  <div class="flex gap-4">
+    <app-single-select-dropdown labelText="Compare Currency 1" [options]="exchangeRatesTableDropdownOptions()"
+      [(value)]="firstSelectedCurrencyToCompare" />
+
+    <app-single-select-dropdown labelText="Compare Currency 2" [options]="exchangeRatesTableDropdownOptions()"
+      [(value)]="secondSelectedCurrencyToCompare" />
+
+    <app-single-select-dropdown labelText="Compare Currency 3" [options]="exchangeRatesTableDropdownOptions()"
+      [(value)]="thirdSelectedCurrencyToCompare" />
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-4 chart-container">
+    <canvas #exchangeRateChart></canvas>
+  </div>
+
+  @if (!hasSelectedCurrencies()) {
+    <div class="text-gray-500 text-center py-8">
+      <p>Select at least one currency to view the chart</p>
+    </div>
+  }
+</div>
