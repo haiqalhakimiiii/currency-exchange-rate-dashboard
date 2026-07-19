@@ -1,0 +1,85 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Inject staging environment values
+        env:
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+        run: |
+          printf "export const environment = {\n  apiUrl: '%s'\n};\n" "$STAGING_API_URL" > src/environments/environment.staging.ts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test -- --watch=false
+
+      - name: Build staging bundle
+        run: npm run build:staging
+
+      - name: Upload staging artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-dist
+          path: dist/currency-exchange-rate-dashboard/browser
+
+  deploy-staging:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: ci
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+
+    steps:
+      - name: Download staging artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: staging-dist
+          path: staging-dist
+
+      - name: Configure SSH key
+        env:
+          STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$STAGING_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Add staging host to known hosts
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+        run: ssh-keyscan -H "$STAGING_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy to staging
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+          STAGING_USERNAME: ${{ secrets.STAGING_USERNAME }}
+          STAGING_PATH: ${{ secrets.STAGING_PATH }}
+        run: rsync -avz --delete staging-dist/ "$STAGING_USERNAME@$STAGING_HOST:$STAGING_PATH/"

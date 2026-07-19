@@ -192,6 +192,31 @@ npm run build
 
 Output is generated in `dist/`.
 
+Create staging build:
+
+```bash
+npm run build:staging
+```
+
+## CI/CD
+
+The repository includes a GitHub Actions workflow at `.github/workflows/ci-cd.yml`.
+
+- Pull requests and pushes run `lint`, `test`, and `build:staging`.
+- Pushes to `main` also deploy the built app to the `staging` environment over SSH.
+
+Configure these GitHub repository secrets before enabling staging deployment:
+
+- `STAGING_API_URL`: API base URL that should be baked into the staging build.
+- `STAGING_HOST`: SSH host for the staging server.
+- `STAGING_USERNAME`: SSH user used for deployment.
+- `STAGING_SSH_KEY`: private key with write access to the staging target.
+- `STAGING_PATH`: remote directory that should receive the built files.
+
+Optional repository variable:
+
+- `STAGING_URL`: public URL shown on the GitHub Actions environment page.
+
 ## Troubleshooting
 
 - App loads but no data appears:

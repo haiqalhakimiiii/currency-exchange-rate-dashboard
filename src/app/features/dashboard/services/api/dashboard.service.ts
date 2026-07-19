@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
-import { delay, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CurrencyConversionResponse, ExchangeRatesResponse, HistoryConversionRatesResponse } from '../../models/dashboard.model';
 import { HttpClient } from '@angular/common/http';
 
