@@ -225,4 +225,4 @@ Optional repository variable:
 - Tests involving charts log canvas warnings in jsdom:
 	- This can happen in unit-test environments and may not indicate functional failures.
 - CORS or request failures:
-	- Confirm your API plan and endpoint accessibility from the browser.
+	- Your API plan should be a Pro plan since the trend analysis is using Historical Exchange Rates API endpoint.
