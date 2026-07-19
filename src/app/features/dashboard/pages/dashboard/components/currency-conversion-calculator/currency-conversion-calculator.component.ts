@@ -53,7 +53,7 @@ export class CurrencyConversionCalculatorComponent {
     effect(() => {
       this.fromCurrency();
       this.toCurrency();
-      this.currencyConversionModel().amount;
+      void this.currencyConversionModel().amount;
 
       this.currencyConversionResult.set(null);
       this.errorMessage.set(null);
