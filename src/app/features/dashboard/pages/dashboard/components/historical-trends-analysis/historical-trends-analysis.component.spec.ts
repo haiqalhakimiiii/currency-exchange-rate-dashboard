@@ -49,16 +49,16 @@ describe('HistoricalTrendsAnalysisComponent', () => {
       { conversion_rates: { USD: 1.2 } },
       { conversion_rates: { USD: 1.4 } },
       { conversion_rates: { USD: 1.6 } },
-    ] as any;
+    ] as unknown as { conversion_rates: Record<string, number> }[];
 
-    const aggregated = (component as any).getAggregatedCurrencyRate(historicalData, 'USD', [0, 2]);
+    const aggregated = (component as unknown as { getAggregatedCurrencyRate: (data: unknown, currency: string, indexes: number[]) => number }).getAggregatedCurrencyRate(historicalData, 'USD', [0, 2]);
     expect(aggregated).toBe(1.4);
   });
 
   it('should build weekly aggregation buckets in seven-day groups', () => {
     const dates = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05', '2026-07-06', '2026-07-07', '2026-07-08'];
 
-    const buckets = (component as any).getAggregationBuckets(dates, 'weekly');
+    const buckets = (component as unknown as { getAggregationBuckets: (dates: string[], mode: string) => { indexes: number[] }[] }).getAggregationBuckets(dates, 'weekly');
     expect(buckets.length).toBe(2);
     expect(buckets[0].indexes).toEqual([0, 1, 2, 3, 4, 5, 6]);
     expect(buckets[1].indexes).toEqual([7]);

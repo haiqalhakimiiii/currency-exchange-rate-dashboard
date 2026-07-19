@@ -64,7 +64,7 @@ describe('CurrencyConversionCalculatorComponent', () => {
   });
 
   it('should convert currency and set result when submit succeeds', () => {
-    let convertCalls: Array<[string | number, string | number, number]> = [];
+    const convertCalls: Array<[string | number, string | number, number]> = [];
     convertCurrencyImpl = (from, to, amount) => {
       convertCalls.push([from, to, amount]);
       return of({
